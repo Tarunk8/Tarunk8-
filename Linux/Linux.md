@@ -21,3 +21,26 @@
 - It si high speed storage area for temporary storage
 - It is made of Static RAM
 - It increasing the accessing speed of CPU
+
+#######
+- to regenerate the initramfs file if the kernel panic happend Go to rescue mode by booting the linux and select rescue option
+- we can use either mkinitrd or dracut command to generate the initramfs file
+- rpmquery kernel
+- mkinitrd
+
+- dracut initramfs-3.10.0-1160.114.2.el7.x86_64.img 3.10.0-1160.114.2.el7.x86_64
+- reboot the machine
+
+- If already initramfs files is present and its currupted then use the -f command to do the forcefully.
+- dracut -f initramfs-3.10.0-1160.114.2.el7.x86_64.img 3.10.0-1160.114.2.el7.x86_64
+
+# or
+
+- another method if all initramfs files get deleted then 
+
+- attach ISO and boot the linux and select "troubleshoot" while booting 
+- Then select "rescue mode" then press "1" to enter in rescue mode
+- chroot /mnt/sysimage
+- cd /boot 
+- dracut --regenerate-all --force    (after some time it will show the initram fs files on /boot)
+- ls 
