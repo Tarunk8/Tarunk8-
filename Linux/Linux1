@@ -1,1 +1,22 @@
+Buffer memory
 
+- Buffer is tempporary storage area, usually in memory
+- it is mostly used in input/output process
+- Example: In print operation CPU given data for printing , it is temporary stored in buffer.
+  after giveing data to printer, CPU will do other task in system and printing will be doine by the data in buffer.
+- Buffer is used to compensate that exchange or use data. 
+- It is mostly used for input/output processes
+- It is noramal storage area on RAM for temporary storage
+- it si made of dynamic RAm
+- It doesnt increase the accessing time
+
+Cache memory
+
+- cache is holding recently access data
+- it is fastest memory in entire system
+- All the oprations done by computer system is well organized with respect to cache memory
+- Chache is smaller and fastest memory component in the computer.
+- It si used during readiing and writing process from the disk.
+- It si high speed storage area for temporary storage
+- It is made of Static RAM
+- It increasing the accessing speed of CPU
