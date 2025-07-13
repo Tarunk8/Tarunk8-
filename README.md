@@ -3,6 +3,7 @@
 <h3 align="center">A passionate software engineer from India</h3>
 
 <img align="right" alt="coding" width="400" src="https://miro.medium.com/v2/resize:fit:4800/1*7qnCPIh9Bg3yB96XtrlCkg.gif">
+<img align="right" alt="coding" width="400" src="https://user-images.githubusercontent.com/55389276/140866485-8fb1c876-9a8f-4d6a-98dc-08c4981eaf70.gif">
 
 
 <p align="left"> <img src="https://komarev.com/ghpvc/?username=tarunk8&label=Profile%20views&color=0e75b6&style=flat" alt="tarunk8" /> </p>
