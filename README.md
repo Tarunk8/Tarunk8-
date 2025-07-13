@@ -1,4 +1,5 @@
 ![logo](https://github.com/Tarunk8/Tarunk8-/blob/main/github-header-image.png)
+![logo](https://github.com/Tarunk8/Tarunk8-/blob/main/1_7qnCPIh9Bg3yB96XtrlCkg%20(1).gif)
 <h1 align="center">Hi 👋, I'm Tarun kumar</h1>
 <h3 align="center">A passionate software engineer from India</h3>
 
