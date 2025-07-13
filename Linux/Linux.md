@@ -44,3 +44,31 @@
 - cd /boot 
 - dracut --regenerate-all --force    (after some time it will show the initram fs files on /boot)
 - ls 
+
+# Recover grub.conf.............
+- For practise first to regenerate the issue delete the /boot/grub2/grub.cfg  file then reboot you will getb the grub error.
+error 
+grub>
+
+- go to rescue mode by attaching the iso disk media -> press 1 to enter single user mode to resuce mode
+- chroot /mnt/sysimage
+- grub2-install /dev/sda
+- grub2-makeconfig -o /boot/grub2/grub.cfg
+- exit
+- you can see the grub will be recover.
+
+# How we create multiplpe users in a single user add command...
+[root@worker ~]# cat users
+tolu:x:4002:4002::/home/tolu:/bin/bash
+golu:x:4001:4001::/home/golu:/bin/bash
+molu:x:4003:4003::/home/molu:/bin/bash
+
+- newusers users
+cat /etc/passwd
+
+- for password we need to write the script fore multiple user password
+
+vi password 
+
+- while IFS=: read u x nn rest; do if [ $nn -ge 1000 ]; then echo 'Passw0rd' | passwd --stdin $u; fi done < /etc/passwd
+
