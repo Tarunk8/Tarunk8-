@@ -1,1 +1,3 @@
-
+- What si the difference Docker and Kubernetes
+  -  Basically docker building in and runnning single container
+ - where as kubernetes is a system, its a group of vurtual machine.
