@@ -38,4 +38,26 @@ Run again:
 
 kubectl top nodes
 kubectl top pods
+# .................................................
+
+# $ kubeadm init
+
+[WARNING Firewalld]: firewalld is active, please ensure ports [6443 10250] are open or your cluster may not function correctly
+error execution phase preflight: [preflight] 
+
+Some fatal errors occurred: [ERROR CRI]: container runtime is not running Status from runtime service failed” err=”rpc error: code = Unimplemented desc = unknown service runtime.v1alpha2.RuntimeService”
+[ERROR CRI]: container runtime is not running [Issue Encountered]
+This is a common issue when you run the kubeadm init command while the CRI used is Containerd. In most cases, the issue is with the config.tomal file.
+
+# Fix the Error
+To fix the error you can delete the config.tomal file and restart containerd then try the init command like below:
+
+$ rm /etc/containerd/config.toml
+$ systemctl restart containerd
+$ kubeadm init
+For the [WARNING Firewalld]: firewalld is active, please ensure ports [6443 10250] are open or your cluster may not function correctly, you must configure the firewall on the master and workers.
+
+
+
+
 
