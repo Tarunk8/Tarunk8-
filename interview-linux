@@ -1,0 +1,1809 @@
+........Linux Interview Question answer nov_2024......................
+
+
+Buffer memory
+
+- Buffer is tempporary storage area, usually in memory
+- it is mostly used in input/output process
+- Example: In print operation CPU given data for printing , it is temporary stored in buffer.
+  after giveing data to printer, CPU will do other task in system and printing will be doine by the data in buffer.
+
+- Buffer is used to compensate that exchange or use data. 
+- It is mostly used for input/output processes
+- It is noramal storage area on RAM for temporary storage
+- it si made of dynamic RAm
+- It doesnt increase the accessing time
+
+Cache memory
+
+- cache is holding recently access data
+- it is fastest memory in entire system
+- All the oprations done by computer system is well organized with respect to cache memory
+- Chache is smaller and fastest memory component in the computer.
+- It si used during readiing and writing process from the disk.
+- It si high speed storage area for temporary storage
+- It is made of Static RAM
+- It increasing the accessing speed of CPU
+
+..................................
+
+...................................................................
+to regenerate the initramfs file if the kernel panic happend
+Go to rescue mode by booting the linux and select rescue option
+- we can use either mkinitrd or dracut command to generate the initramfs file
+#rpmquery kernel
+mkinitrd
+
+dracut initramfs-3.10.0-1160.114.2.el7.x86_64.img 3.10.0-1160.114.2.el7.x86_64
+reboot the machine
+
+If already initramfs files is present and its currupted then use the -f command to do the forcefully.
+dracut -f initramfs-3.10.0-1160.114.2.el7.x86_64.img 3.10.0-1160.114.2.el7.x86_64
+
+or
+
+another method if all initramfs files get deleted then 
+
+attach ISO and boot the linux and select "troubleshoot" while booting 
+Then select "rescue mode" then press "1" to enter in rescue mode
+#chroot /mnt/sysimage
+#cd /boot 
+#dracut --regenerate-all --force    (after some time it will show the initram fs files on /boot)
+#ls 
+
+......................Recover grub.conf.................................................
+first to regenerate the issue delete the /boot/grub2/grub.cfg  file then reboot
+error 
+grub>
+
+- go to rescue mode by attaching the iso disk media -> press 1 to enter single user mode to resuce mode
+chroot /mnt/sysimage
+grub2-install /dev/sda
+grub2-makeconfig -o /boot/grub2/grub.cfg
+
+....................HOW WE CREATE MULTIPLE USER IN SINGLE USER ADD COMMAND.........
+[root@worker ~]# cat users
+tolu:x:4002:4002::/home/tolu:/bin/bash
+golu:x:4001:4001::/home/golu:/bin/bash
+molu:x:4003:4003::/home/molu:/bin/bash
+
+# newusers users
+cat /etc/passwd
+
+for password we need to write the script fore multiple user password
+
+vi password 
+
+while IFS=: read u x nn rest; do if [ $nn -ge 1000 ]; then echo 'Passw0rd' | passwd --stdin $u; fi done < /etc/passwd
+
+................how do you check the open file.........................
+lsof -u tom
+lsof -i 4 (ipv4)
+lsof -i 6
+.................Booting process...............................
+BIOS
+MBR
+GRUB
+Kernel
+SYSTEMD
+
+
+-> BIOS
+- Basic I/O system
+- First programme that executed which is stored in read-only memory on motherboard on computer.
+- Perform POST (power on self test) verify ther hardware components and peripheral to ensure
+  if computer is in working condition
+- check for bootable device like pendirive, hardisk etc
+- handover control to first sector of device i.e MBR
+
+Apart from BIOS, UEFI (Inified Extensible Firmware interface) is used.
+
+-> MBR
+- maaster boot record
+- 512 bites, first sector of any bootable device contains machine code instruction to boot a machine
+  and having following info
+  
+  . Boot loader (446 bytes)
+  . partition table (64 bytes)
+  . Error Checking  (2 bytes)
+- It will load the boot loader into the memory and handover to it
+
+-> GRUB
+- Load  /boot/grub2/grub.cfg at boot time
+- At this stage , user will see GUI asking different OS kernels configured to boot
+- Once you selected the kernel, it locates the corrosponding kernel binary
+  /boot/vmlinuz-<kernel-version>
+- main job is load kernel and initrd/initramfs image into memory
+- Once Load kernel in RAM, it passes control to it
+- IN RHEL7, default boot loader is GRUB2
+- GRUB is x86 architcture, it could be different for other arch like of rintel itanium - ELILO
+
+->Kernel
+- First kernel is load in to read only mode
+- Initramfs/initrd gets decompressed and then it first load the temporary file system.
+- Ititrd then detact and load the drivers from temporary filesystem to load actual file system.
+- mount other partition like LVM, RAID etc unmount itself.
+- Once main filesystem is mounted, kernel initialize the first process init/systemd
+- you can find these image under /boot folder.
+
+-> SYSTEMD
+
+- First service loaded  with processs ID 1
+- start all required processes
+/etc/systemd/system/default.target
+- To bring the system to thew run-level/trget (0-6)
+- you can find the different runlevel file under 
+/usr/lib/systemd/system
+ls -l runlevel*
+
+->TARGET
+
+- To check the default target the runlevel 
+#systemctl get-default
+
+....................INODE NUMBER...................
+- An Inode number is a data structure that contains meta data about a file.
+Permission, the number of links, owner, group owner, file length date of modification time, file name.
+all contain information on inode number 
+symlink has differnet inode number, if the manin file is delete then we cannot get the data from soft link
+hardlink has same indoe number, if main file is deleted then also we can get the data
+
+....................TO CHECK THE PID AND KILL...............................
+echo $$
+echo $$ $PPID
+
+
+..................TO CHECK THE UPDATED PACKAGES AND DOWNGRADE THE UPDATED PACKAGES.................
+
+- yum history info 18
+- yum history info 18
+- yum downgrade python-perf-3.10.0-1160.108.1.el7.x86_64  (the packages which you want to downgrade )
+- yum history undo 18  ( to revert back the yum update it will downgrade all the packages but kernel cant be downgrade on yum history undo command )
+- yum history list  firefox  ()
+- yum history packages-info firefox (we can see the packages upgrade and downgrade date)
+- yum check-update --security
+
+
+
+..................IPV4..............................
+1 byte = 8 bit
+- in ipv4 there are 12 fields in ipv4 
+- ipv4 are 20 bytes header minimum...
+- we can increase maximum 40 bytes  to tal 20+40 = 60 can be increase
+
+....................port and connectivity....................
+- To comunicate the port from one source to destination then two side port need to be open
+ex: source - rendom port - 4530   &  destination 80 or 443 port or 22 depends on what access you need.
+...........................ICMP rpotocol...........................
+ICMP -> IGMP -> UDP -> then TCP PROTOCOL
+
+--- ARP request is called broadcast
+----ARP response is called unicast
+
+-OSI module define and it used to understand how the data is transfer from one computer to another computer.
+
+-OSi fulform open system integration module
+there are 7 layer
+1 application
+2 presentation
+3 session
+4 transport
+5 network
+6 datalink 
+7 physical layer
+
+
+Sender side 1st layer is Application layer 
+receiver side 1st layer is physical layer
+
+presentation layer make the data encryption decryption and it maske the data extention.
+session layer is end to end layer
+TCP/UDP protocal works on transport layer
+
+................................NIC TEAMING......................................
+To check the connection of nic card
+#nmcli connection show
+#teamdctl team0 state    ( to check the nic teaming status)
+#nmcli connection down port1 ( to down the one nic card from nic bonding)
+#nmcli connecton up port1   ( to up the nic card which was down )
+#
+#nmcli connection down port2   ( to down the 2nd nic card from nic bonding)
+..............................Security vulnerability management..................
+
+Vulnerability fixes  within the date 
+critical ist 15 days 
+high 30 days
+medium 60 days
+low 90 days
+
+...............................Password lock for a user........................
+
+-> If want to lock any user tarun
+passwd -l tarun
+ - > to check the status user is locked or not status
+passwd -S tarun
+-> If you want to unlock the user tarun
+passwd -u tarun
+
+.............................404 ERROR CODE......................
+What to do if you get a 404 error
+Double-check the URL for typos. Only one mistyped character can result in a 404 error. ...
+Refresh the webpage. 404 errors might be a momentary glitch.
+Search the web. ...
+Use another device. ...
+Go to the Internet Archive's Wayback Machine. ...
+Contact the website.
+
+....How to Resolve a 403 Forbidden Error
+
+Refresh the Page and Verify the URL.
+Clear your browser cache and cookies.
+Run a malware scan.
+Delete and renew your .htaccess file.
+Review and revise file and directory permissions.
+Deactivate WordPress plugins.
+A record verification and nameserver update.
+Temporarily disable CDN.
+
+......What is 401
+
+
+What causes a 401 error?
+How to Fix the 401 Error (5 Solutions) - Kinsta®
+The 401 (Unauthorized) status code indicates that the request has not been applied
+because it lacks valid authentication credentials for the target resource. 
+The server generating a 401 response MUST send a WWW-Authenticate
+header field containing at least one challenge applicable to the target resource
+
+......CDN
+
+A content delivery network (CDN) is a geographically distributed group of servers
+that caches content close to end users. A CDN allows for the quick transfer of assets needed
+for loading Internet content, including HTML pages, JavaScript files, stylesheets, images, and video
+
+......Why do people use CDN?
+
+CDNs help reliably and cost-effectively deliver rich and high-quality media files.
+Companies streaming video and audio use CDNs to overcome three challenges: 
+reduce bandwidth costs, increase scale, and decrease delivery time.
+
+### Describe how you'd troubleshoot a situation where a user cannot log in to a Linux system.
+- When a user is struggling to log in to a Linux system, you can:
+
+- Verify the user's username and password. Ensure the user is using the correct credentials.
+
+- Check if the user account is locked. Use the `passwd -S username` command to see the account status
+- Inspect the permissions of the user's home directory. The permissions must allow the user to read and write.
+
+- Examine system logs. Look at the `/var/log/auth.log` file for error messages related to the login issue.
+
+- If you’re using SSH for remote login, check the SSH configuration file for any restrictions on the user's access.
+
+### memory
+- `ps aux --sort=-%mem | head -n 10` 
+- This command sorts the processes by memory usage, displaying the ten processes using the most memory.
+
+### How To Find Largest Top 10 Files and Directories On Linux / UNIX / BSD
+
+- Steps to find Largest directories in Linux
+    - `du` command : Estimate file space usage.
+    - `sort` command : Sort lines of text files or given input data.
+    - `head` command : Output the first part of files i.e. to display first 10 largest file.
+    - `find` command : Search file
+- https://www.tecmint.com/find-top-large-directories-and-files-sizes-in-linux/
+
+```bash
+# To display the largest folders/files including the sub-directories, run:
+du -ah /var | sort -n -r | head -n 10
+
+# du command -h option : display sizes in human readable format (e.g., 1K, 234M, 2G).
+# du command -s option : show only a total for each argument (summary).
+# du command -x option : skip directories on different file systems.
+# sort command -r option : reverse the result of comparisons.
+# sort command -h option : compare human readable numbers. This is GNU sort specific option only.
+# head command -10 OR -n 10 option : show the first 10 lines.
+
+# OR try to skip directories on different file systems such as /proc/ or other mounted system such as NFS by passing the -x option
+
+#####
+# If you want to display the biggest file sizes only, then run the following command:
+
+find -type f -exec du -Sh {} + | sort -rh | head -n 5
+
+```
+### Understanding File System Superblock in Linux
+https://www.geeksforgeeks.org/dumpe2fs-command-in-linux-with-examples/
+- its the metadata of the file system. 
+- Similar to how i-nodes stores metadata of files, Superblocks store metadata of the file system. 
+- As it stores critical information about the file system, preventing corruption of superblocks is of utmost importance.
+
+- If the superblock of a file system is corrupted, then you will face issues while mounting that file system. 
+- The system verifies and modifies superblock each time you mount the file system.
+
+- Superblocks also stores configuration of the file system. Some higher level details that is stored in superblock is mentioned below.
+
+    - Blocks in the file system
+    - No of free blocks in the file system
+    - Inodes per block group
+    - Blocks per block group
+    - No of times the file system was mounted since last fsck.
+    - Mount time
+    - UUID of the file system
+    - Write time
+    - File System State (ie: was it cleanly unounted, errors detected etc)
+    - The file system type etc(ie: whether its ext2,3 or 4).
+    - The operating system in which the file system was formatted
+
+```bash=
+# To get the info of superblocks
+dumpe2fs -h /dev/sda
+
+Superblock contains:
+
+- The size of file system
+- The number of free blocks in the file system
+- A list of three blocks available on the file system
+- The index of the next free block in the free block list
+- The size of the inode list
+- The number of three nodes in the file system
+- The index of next free inode in the free inode list.
+- Lock field for the free block and free indoe list
+- Kernel uses algorithmm iget to allocate known inode whose file system and indoe number
+  was determined previously.
+- Inode assignment to a new file is done by ialloc algorithm.
+- As we know file system contains linear list of inodes 
+- An inode is free if its type field is zero
+- When a process needs a new inode, the kernel couls theoritcally search the inode
+  list for a  free inode , It requires at least one read operation (possibly from disk)
+  for every nodes
+- To improve performance, the file system super block 
+```
+
+### What is the difference between umask and ulimit ?
+#### umask:
+- Umask value defaults the file/folder permission and the file/folder will take the updated permission value till reboot.
+- Default value of the Umask is defined in OS and is “022”.
+- Syntax to change the umask value: umask <value>
+- Though the UMask value is changed using the above syntax, the value is reverted back to the value set in OS.
+
+#### Ulimit:
+- ulimit is admin access required Linux shell command which is used to see, set, or limit the resource usage of the current user.
+- It is used to return the number of open file descriptors for each process. 
+- It is also used to set restrictions on the resources used by a process.
+- To check ulimit value 🡺 `ulimit -a`
+- Display number of open files limit 🡺 `ulimit -n`
+- Display the size of core file 🡺 `ulimit -c`
+- Display maximum users process or for showing maximum user process limit for the logged-in user 🡺 `ulimit -u`
+- Display maximum file size a user can have 🡺 `ulimit -f`
+- The `soft limits` are the limits which are allocated for actual processing of application or users while the `Hard limits` are nothing but an upper bound to the values of soft limits. Hence,
+
+- `/etc/security/limits.conf`
+
+
+### How to locate a package installed by yum?
+
+- `yum list php-imap`
+
+### How to find source files for things installed via yum on CentOS
+- `repoquery -l ansible`
+
+### fork command in linux example
+
+https://medium.com/@joshuaudayagiri/linux-process-calls-creating-process-using-fork-52a1eac7de8b
+
+- is used to create a child process
+- If parent process is busy in that condition fork create create a child process.
+- Means clone of parent process with seperate ID
+
+https://www.youtube.com/watch?v=ixq5cpdEO2Q
+
+
+### Kernel Modules
+
+- kernel modules location in linux `/lib/modules/`
+
+
+### How to Generate a Self-Signed SSL Certificate on Linux
+```bash
+openssl genrsa -des3 -passout pass:x -out keypair.key 2048
+# This command uses 2048 bit encryption and outputs a file called keypair.key
+
+# Step 2: Extract the Private Key into the “httpd” Folder
+sudo mkdir /etc/httpd/httpscertificate
+
+# location of ssl certificate
+SSLEngine on
+# The path to the complete chain of your SSL certificate
+SSLCertificateFile /etc/pki/tls/certs/full-chain.pem
+# The path to the private key
+SSLCertificateKeyFile /etc/pki/tls/private/privkey.pem
+# The path to the content of your website.
+
+```
+
+
+## Detailed SSH troubleshooting steps for issues connecting to a Linux VM in Azure
+### permission denyied
+- Check autorised keys
+- Check user name on server
+-  `nmap -A 192.168.1.10` -- check which port is listning on remote server
+- use -vvvv to verbose output
+```bash
+[root@foreman pulp]# nmap -A 192.168.1.35
+
+Starting Nmap 6.40 ( http://nmap.org ) at 2024-03-21 06:54 EDT
+Nmap scan report for 192.168.1.35
+Host is up (0.0012s latency).
+Not shown: 996 filtered ports
+PORT     STATE  SERVICE   VERSION
+22/tcp   open   ssh       OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 2048 ac:d8:0a:a8:6a:1f:78:6d:ac:06:8f:65:3e:ff:9c:8b (RSA)
+|_256 e7:f8:b0:07:1c:5b:4a:48:10:bc:f6:36:42:62:6c:e0 (ECDSA)
+80/tcp   closed http
+443/tcp  closed https
+9100/tcp closed jetdirect
+MAC Address: 08:00:27:83:D3:06 (Cadmus Computer Systems)
+Aggressive OS guesses: Linux 3.0 - 3.9 (93%), Linux 2.6.22 - 2.6.36 (91%), Linux 2.6.39 (90%), Linux 2.6.32 - 3.9 (89%), Linux 2.6.26 - 2.6.35 (89%), Crestron XPanel control system (88%), Netgear DG834G WAP or Western Digital WD TV media player (88%), HP P2000 G3 NAS device (88%), Ubiquiti AirMax NanoStation WAP (Linux 2.6.32) (88%), Linux 2.6.32 (88%)
+No exact OS matches for host (test conditions non-ideal).
+Network Distance: 1 hop
+
+TRACEROUTE
+HOP RTT     ADDRESS
+1   1.21 ms 192.168.1.35
+
+OS and Service detection performed. Please report any incorrect results at http://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 14.08 seconds
+```
+- telnet 192.168.1.10 22
+- this will show connectivity
+- check in `ssh_config` that `PasswordAuthentication yes`
+
+### port 22 connenction refused
+- ping the server
+- check sshd service
+- Wrong credentials and port
+```bash
+# chage juan
+Changing the aging information for juan
+Enter the new value, or press ENTER for the default
+Minimum Password Age [0]: 10
+Maximum Password Age [99999]: 90
+Last Password Change (YYYY-MM-DD) [2006-08-18]:
+Password Expiration Warning [7]:
+Password Inactive [-1]:
+Account Expiration Date (YYYY-MM-DD) [1969-12-31]:
+```
+- If port is open or close
+- Check Firewall rules `firewall-save` if you see drop change it to Accept
+
+### port 22 connenction timeout
+- ping
+- check firewall rules
+
+### port 22 connenction failed
+- check and delete key fingerprint from autorised keys
+
+### ssh: Could not resolve hostname example.com: Name or service not known
+
+### If user is locked then Check the lock status of any Linux Account
+```bash
+[root@jumphost ~]# usermod -L rajeev
+
+[root@jumphost ~]# passwd -S rajeev
+rajeev LK 2024-03-28 -1 -1 -1 -1 (Password locked.)
+
+[root@jumphost ~]# usermod -U rajeev
+[root@jumphost ~]# passwd -S rajeev
+rajeev PS 2024-03-28 -1 -1 -1 -1 (Password set, SHA512 crypt.)
+```
+
+### Case 1: Password Locked
+In this case the password of any account is locked using the below command
+To lock the password
+```bash
+# passwd -l user1
+Locking password for user user1.
+passwd: Success
+Review the status in /etc/shadow
+```
+```bash
+# grep user1 /etc/shadow 
+user1:!!$6$ciJaoDR9$Qpt9sctRLjbZ4/Agxy9UOvu/XQqNrFo9rpgfZ/xrF/8JphkEvF29ITpef0SVLdJcrpv8Q/.6mRAHee4tZT0r11:16299:0:99999:7:::
+```
+- As you can see above two exclamation mark `(!!)` before the encrypted password which means that the password has been locked
+
+#### To unlock the password
+```bash
+# passwd -u user1
+Unlocking password for user user1.
+passwd: Success
+```
+
+### Case 2: Account is Locked
+- In this case the user account might have been locked by the administrator
+- To lock an account
+```bash
+# usermod -L user1
+```
+- Review your /etc/shadow file for the changes
+```bash
+# grep user1 /etc/shadow
+user1:!$6$ciJaoDR9$Qpt9sctRLjbZ4/Agxy9UOvu/XQqNrFo9rpgfZ/xrF/8JphkEvF29ITpef0SVLdJcrpv8Q/.6mRAHee4tZT0r11:16299:0:99999:7:::
+```
+- As you see an extra single exclamation mark(!) appeared in the password section before the encrypted password starts which signifies that the user account is locked
+- To unlock a user account
+```bash
+# usermod -U user1
+```
+
+### Case 3: Password never set
+- This can also be the scenario where the administrator has not assigned any password due to which the user is not able to login
+- So to verify this again you need to check your `/etc/shadow` file
+```bash
+# grep user1 /etc/shadow
+user1:!!:16299:0:99999:7:::
+```
+- As you see two exclamation mark `(!!)` is there but no encrypted password which means a password is not set.
+- If the password was set without lock your `/etc/shadow` would look like something below
+```bash
+# grep user1 /etc/shadow
+user1:$6$ciJaoDR9$Qpt9sctRLjbZ4/Agxy9UOvu/XQqNrFo9rpgfZ/xrF/8JphkEvF29ITpef0SVLdJcrpv8Q/.6mRAHee4tZT0r11:16299:0:99
+```
+
+-------------------------------------------------------------------------------------------------------
+
+## df is not showing all mounted filesystems
+
+- There are 7 types fo files is persent in linux 
+"-"   Regular file
+"d" directory
+"|" Link file
+"C" Device file
+"s" Socket file
+"P" FIFO or Named Pipe
+"d" Block device
+
+
+
+
+```bash
+# df -Ph
+Filesystem            Size  Used Avail Use% Mounted on
+/dev/mapper/rootvg-rootvol  3.8G  1.7G  2.0G  45% /
+/proc/mounts shows everything mounted file.
+```
+### Resolution
+- Rebooting will recreate the /etc/mtab file.
+- If rebooting is not an option, as a temporary workaround, copying the contents of /proc/mounts to `/etc/mtab` will work:
+```bash
+# cat /proc/mounts > /etc/mtab
+```
+### Root Cause
+- The server's `/etc/mtab` file was missing entries.
+### Diagnostic Steps
+- Since df pulls information from `/etc/mtab`, check to see if this file contains any data:
+```bash
+# cat /etc/mtab
+/dev/mapper/rootvg-rootvol / ext3 rw 0 0
+proc /proc proc rw 0 0
+```
+- In this case, only the root filesystem is listed in `/etc/mtab`, which is why only the root filesystem shows up with running `df`.
+
+## Why df shows different device size then LVM command in Red Hat Enterprise Linux?
+```bash
+df -h
+
+Raw
+Filesystem                      Size  Used Avail Use% Mounted on
+/dev/mapper/datavg-datalv        26G  1.1G   21G   5%   /data
+lvs
+
+Raw
+  LV           VG               Attr            LSize   Pool 
+ datalv    datavg             -wi-ao----       64.90G
+```
+### Resolution
+- The filesystem should be recreated as the inode count is a way to high than the block count.
+### Root Cause
+- df displays the amount of disk space available on the file system.
+- It does a calculation of blocks used and inodes used and determine the most accurate amount of space remaining on the filesystem.
+- lvs, or any commands working at block device layer, will report the size of the block device. Basically, the quantity of space between the first block and the last block.
+- df command will work at the file system level. In order to remain file system independent, it requests the number of blocks via statfs(2) system call, and use f_blocks as a base value for the size. As defined by statfs(2) man page, this is the "total data blocks in file system", which differs from the actual total number of blocks of the block device, and is file system specific.
+- For example, in the case of an ext3 file system, among others, the data block reported will exclude from the total size the primary and backup superblocks, and will be calculated on the fly in each statfs(2) call.
+
+```bash
+Raw
+                            count         blks each      blocks               size
+diskblocks            17013760                 1           17013760      64.90   GiB(69.69 GB)
+free                   6304446                 1           6304446       24.05   GiB(25.82 GB)
+data blocks             252170                 1           252170        985.04  MiB(1.03  GB)
+journal                      1                 32768       32768         128     MiB(134.22MB)
+reserved                848122                 1           848122        3.24    GiB(3.47  GB)
+metadata              10424376                 1           10424376      39.77   GiB(42.70 GB)
+  superblocks               18                 1           18            72      KiB(73.73 KB)
+  grp.descr.                18                 40          720           2.81    MiB(2.95  MB)
+  reserved GDT              18                 991         17838         69.68   MiB(73.06 MB)
+  data  bitmaps           5076                 1           5076          19.83   MiB(20.79 MB)
+  inode bitmaps           5076                 1           5076          19.83   MiB(20.79 MB)
+  inode tables            5076                 2048        10395648      39.66   GiB(42.58 GB)
+    free             166318996                 0.0625      10394937.25   39.65   GiB(42.58 GB)
+    in-use               11372                 0.0625      710.75        2.78    MiB(2.91  MB)
+```
+- 42Gb is occupied alone by the inode table.
+
+## fsck check in detail
+
+- The fsck command checks the integrity of a partition
+- When running this command, you should do it with a non-active partition, this means = un-mounted, of course. 
+- It also can perform interactive repairs on one or more Linux file systems.
+- if the filesystem type is ext2, ext3, or ext4, then then you should use the e2fsck instead.
+- Then run: `sudo fsck -p /dev/scb1` . The `-p` options tell fsck to automatically repair any problems that can be safely fixed without user intervention
+- The difference between them is the approach, the fsck outputs a "clean" when is correct, the e2fsck performs and outputs a more complete and detailed scan.
+
+```bash
+[root@node01~]# e2fsck -f /dev/testvg/testlv
+e2fsck 1.41.12 (17-May-2010)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+```
+
+### Repair XFS FS
+```bash
+# dry run using -n
+ xfs_repair -n /dev/sdb1
+
+xfs_repair  /dev/sdb1
+```
+
+## XFS FS reduce
+
+- At the moment, functionality to shrink XFS filesystems is not available in RHEL
+- Use some backup/restore solution, such as xfsdump and xfsrestore. This may be useful especially if the filesystem is mostly empty.
+
+Using the following procedure :
+
+1) Backup the data using xfsdump
+```bash
+xfsdump -f /tmp/test.dump /test
+```
+2) Unmount the filesystem
+```bash
+umount /test
+```
+3) remove the filesystem and create new lv
+```bash
+lvremove /dev/vg00/lv00
+lvcreate -L 400M /dev/vg00/lv00
+```
+
+4) Format the partition with xfs filesystem
+```bash
+mkfs.xfs -f /dev/vg00/lv00
+```
+5) Remount the filesystem
+```bash
+mount /dev/vg00/lv00 /test
+```
+6) Restore the data using xfsrestor
+```bash
+xfsrestore -f /tmp/test.dump /test
+```
+
+## Why does unmounting the filesystem returns error "device is busy" when lsof does not show any files held open in the memory?
+- Oracle module was still using the filesystem /oracle
+
+Diagnostic Steps
+Checking for oracle modules still running
+```bash
+[root@server ~]# ps -ef|grep ora
+root     13778 10765  0 12:14 pts/0    00:00:00 grep ora   <<<<<<  module exists
+```
+No files open in filesystem /oracle shown in lsof output and fuser output
+```bash
+[root@server ~]# lsof /oracle
+[root@server ~]#
+
+[root@server ~]# fuser -vm /oracle
+[root@server ~]#
+```
+- Unmounting returns an error
+```bash
+[root@server ~]# umount /oracle
+umount: /oracle: device is busy.
+        (In some cases useful info about processes that use
+         the device is found by lsof(8) or fuser(1))
+```
+- Checking the status of oracle module:
+```bash
+[root@server ~]# lsmod |grep ora
+oracleacfs           3332147  0
+oracleadvm            512629  0
+oracleoks             510437  2 oracleacfs,oracleadvm
+```
+- Removing modules since the oracle application has already been shut down:
+```bash
+[root@server ~]# modprobe -vr oracleacfs
+rmmod /lib/modules/2.6.32-431.1.2.el6.x86_64/weak-updates/usm/oracleacfs.ko
+
+[root@server ~]# modprobe -vr oracleadvm
+rmmod /lib/modules/2.6.32-431.1.2.el6.x86_64/weak-updates/usm/oracleadvm.ko
+rmmod /lib/modules/2.6.32-431.1.2.el6.x86_64/weak-updates/usm/oracleoks.ko
+```
+- Checking the status of modules again and trying to unmount and this time unmount works
+```bash
+[root@server ~]# modprobe -vr oracleoks
+
+[root@server ~]# lsmod | grep ora
+
+[root@server ~]# umount /oracle
+[root@server ~]#
+```
+
+
+## How to use the lsof command to troubleshoot Linux
+- The `lsof` command, in combination with other tools like `top` or `ps`.
+- It's commonly said that in Linux, everything is a file.
+
+- For example, suppose you need to know what process is using a particular directory:
+```bash
+lsof /run
+```
+- Perhaps you need to know what files a particular process has open. This example looks at sshd:
+```bash
+lsof -p 22
+
+COMMAND   PID USER   FD      TYPE DEVICE SIZE/OFF NODE NAME
+kintegrit  22 root  cwd       DIR    8,2      224   64 /
+kintegrit  22 root  rtd       DIR    8,2      224   64 /
+kintegrit  22 root  txt   unknown                      /proc/22/exe
+
+```
+- COMMAND: The command name
+- PID: Process ID (PID) of the process
+- USER: Owner of the process
+- FD: File descriptor definition
+- TYPE: Type of file descriptor
+- DEVICE: Device number or, in the case of a block device, character or other
+- SIZE/OFF: Dimension of the file or offset (the suffix 0t is the offset)
+- NODE: Node description of the local file; this could be the number of the local file, TCP, UDP, or STR (stream)
+- NAME: The name of the mount point where the file resides
+
+- You can also discover what files a particular user has open:
+```bash
+lsof -u admin
+```
+
+- For example, suppose you need to know what process uses a particular TCP port (like 22, for example):
+```bash
+lsof -i TCP:22
+```
+- You can also obtain a report on all network processes associated with a particular interface:
+```bash
+lsof -i TCP@127.0.0.1
+```
+
+## Security Weaknesses in Linux Software and Applications
+- Keep software and applications up to date: Make sure to regularly apply updates and patches to fix known vulnerabilities.
+
+### Configuration Errors
+- Use strong passwords: Use strong, unique passwords for all accounts and avoid reusing passwords across multiple accounts.
+- Restrict access to sensitive areas: Use access controls to restrict access to sensitive areas of the system to authorized users only.
+- Disable unnecessary services: Only run services that are necessary for the system's operation, and disable any unnecessary services.
+
+### Using the Security Features of Yum
+```bash
+~]# yum check-update --security
+Loaded plugins: langpacks, product-id, subscription-manager
+rhel-7-workstation-rpms/x86_64                  | 3.4 kB  00:00:00
+No packages needed for security; 0 packages available
+```
+
+### KVM
+- When the qemu-kvm and libvirt packages are updated, it is necessary to stop all guest virtual machines, reload relevant virtualization modules (or reboot the host system), and restart the virtual machines.
+```bash
+~]# lsmod | grep kvm
+kvm_intel             143031  0
+kvm                   460181  1 kvm_intel
+~]# modprobe -r kvm-intel
+~]# modprobe -r kvm
+~]# modprobe -a kvm kvm-intel
+```
+
+- Run `rpm -e PackageName` instead of `yum remove PackageName`. 
+- The command `yum remove PackageName` removes the package binaries but can leave configuration files. 
+- The command `rpm -e PackageName` removes everything related to a package, including the configuration files.
+
+## Finding largest top 10 files and directories On Linux / UNIX / BSD machine
+```bash
+sudo du -a /var/* | sort -n -r | head -n 10
+sudo du -a /* | sort -n -r | head -n 10
+```
+
+## Is the file system is in read-only mode?
+
+- You may end up getting an error such as follows when you try to create a file or save a file:
+- Run mount command to find out if the file system is mounted in read-only mode:
+```bash
+mount
+mount | grep '/ftpusers'
+```
+
+- To fix this problem, simply remount the file system in read-write mode on a Linux based system:
+```bash
+mount -o remount,rw /ftpusers/tmp
+```
+
+## Is my hard drive is dying?
+```bash
+smartctl -a /dev/DEVICE
+# check for /dev/sda on a Linux server
+smartctl -a /dev/sda
+```
+
+## XFS file-system doesn't get mounted, throws error metadata I/O error: block
+- Check /var/log/messages
+- mount: mount /dev/mapper/rhel-root on /mnt/sysimage failed: No space left on device
+- lvextend -L +<size> VG/ThinPoolLV
+
+
+## soft link and hardlink
+
+### Hard Links 
+ 
+- Each hard linked file is assigned the same Inode value as the original, therefore they reference the same physical file location. 
+  Hard links more flexible and remain linked even if the original or linked files are moved throughout the file system, although hard links are unable to cross different file systems.
+- `ls -l` command shows all the links with the link column shows number of links.
+- Links have actual file contents
+- Removing any link, just reduces the link count, but doesn’t affect other links.
+- Even if we change the filename of the original file then also the hard links properly work.
+- We cannot create a hard link for a directory to avoid recursive loops.
+- If original file is removed then the link will still show the content of the file.
+- The size of any of the hard link file is same as the original file and if we change the content in any of the hard links then size of all hard link files are updated.
+- The disadvantage of hard links is that it cannot be created for files on different file systems and it cannot be created for special files or directories.
+
+### Soft Links 
+
+- A soft link is similar to the file shortcut feature which is used in Windows Operating systems. Each soft linked file contains a separate Inode value that points to the original file. 
+As similar to hard links, any changes to the data in either file is reflected in the other. Soft links can be linked across different file systems, 
+although if the original file is deleted or moved, the soft linked file will not work correctly (called hanging link).
+- `ls -l` command shows all links with first column value `l` and the link points to original file.
+- Soft Link contains the path for original file and not the contents.
+- Removing soft link doesn’t affect anything but removing original file, the link becomes “dangling” link which points to nonexistent file.
+- A soft link can link to a directory.
+- The size of the soft link is equal to the length of the path of the original file we gave. E.g if we link a file like ln -s /tmp/hello.txt /tmp/link.txt then the size of the file will be 14bytes
+ which is equal to the length of the “/tmp/hello.txt”.
+- If we change the name of the original file then all the soft links for that file become dangling i.e. they are worthless now.
+- Link across file systems: If you want to link files across the file systems, you can only use symlinks/soft links.
+
+## Azure VM Disk error
+
+https://learn.microsoft.com/en-us/troubleshoot/azure/virtual-machines/linux-recovery-cannot-start-file-system-errors#repair-xfs-filesystem
+
+- You can't connect to an Azure Linux virtual machine (VM) by using the Secure Shell Protocol (SSH), or the VM Agent status in the Azure portal isn't Ready. 
+- When you run the `Boot diagnostics` in the Azure portal or connect to the `Serial Console`, you see log entries that resemble the following examples:
+
+Boot into emergency mode
+Fail to mount xfs filesystem
+Fail to mount ext Logical Volume Manager (LVM) device
+
+### Prevent boot failure
+- If the nofail option is specified when mounting filesystems, the corruption of a non-critical filesystem may not prevent Linux from booting fulty. 
+- For more information about nofail, see Mount the disk. 
+- Most mounts aside from the root (/), /usr, and /var can be done with nofail.
+
+## How to set up LACP bonding interface on CentOS 7
+
+Step 1: Load bonding kernel module
+```bash
+modprobe bonding
+```
+Step 2: Create bonding interface configuration file
+- Create a new configuration file called ifcfg-bond0 in the directory /etc/sysconfig/network-scripts. We use our favorite text-editor nano to do so:
+```bash
+nano /etc/sysconfig/network-scripts/ifcfg-bond0
+```
+We will give this file the following content:
+```bash
+DEVICE=bond0
+Type=Bond
+NAME=bond0
+BONDING_MASTER=yes
+BOOTPROTO=none
+ONBOOT=yes
+IPADDR=89.207.131.xx
+PREFIX=24
+GATEWAY=89.207.131.1
+NM_CONTROLLED=no
+BONDING_OPTS="mode=4 miimon=100 lacp_rate=1"
+```
+- Please replace the IP address on the line IPADDR=89.207.131.xx with the main IP address of your server and GATEWAY=89.207.131.1 with the gateway which is correct for your IP address.
+
+Step 3: Update physical interface configuration files
+- It’s time to update the physical interface configuration files. Our server uses enp6s0 and enp7s0 as interfaces, so we start with enp6s0:
+```bash
+nano /etc/sysconfig/network-scripts/ifcfg-enp6s0
+The content of this file is:
+
+DEVICE=enp6s0
+TYPE=Ethernet
+BOOTPROTO=none
+ONBOOT=yes
+NM_CONTROLLED=no
+IPV6INIT=no
+MASTER=bond0
+SLAVE=yes
+```
+We update enp7s0 next:
+```bash
+nano /etc/sysconfig/network-scripts/ifcfg-enp7s0
+The content of this file is:
+
+DEVICE=enp7s0
+TYPE=Ethernet
+BOOTPROTO=none
+ONBOOT=yes
+NM_CONTROLLED=no
+IPV6INIT=no
+MASTER=bond0
+SLAVE=yes
+```
+Step 4: Reboot
+Reboot your server with:
+```bash
+reboot
+```
+Step 5: Check bonding interface status
+After reboot, your server should have bonding active. Check with:
+```bash
+cat /proc/net/bonding/bond0
+```
+
+### Types of modes
+
+Runner :
+- It is used to implement many kinds of NIC teaming using the JSON format concept. Various runners use team running modes as follows. 
+
+- `Broadcast` –  Here data is sent over all interfaces.
+- `Round-Robin` – Mode 0 Data is sent sequentially over all ports
+- `Active-Backup` – One port or link is used at the same time while the other is kept as a backup
+- `Lacp` –  This is 802.3ad Implements Link Aggregation Control Protocol
+- `Loadbalance` – Active Tx – Load balancing and BPF-based Tx port selector. Traffic is sent over to all NICs.
+
+- teamd nic teaming demon
+
+- Teaming is a new feature,it handles the flows of packets more efficient than bonding does
+```bash
+modprobe team
+```
+```bash
+BOOTPROTO=static
+TEAM_CONFIG='{"runner":{"name":"activebackup"},"link_watch":{"name":"ethtool"}}'
+IPADDR=192.168.122.120
+NETMASK=255.255.255.0
+GATEWAY=192.168.122.1
+NAME=team0
+DEVICE=team0
+ONBOOT=yes
+DEVICETYPE=Team
+PREFIX=24
+```
+```bash
+TEAM_MASTER=team0
+TEAM_PORT_CONFIG='{"prio":99}'
+DEVICETYPE=TeamPort
+NAME=eth3
+HWADDR=52:54:00:8c:33:ba
+DEVICE=eth3
+ONBOOT=yes
+```
+
+## Upgrade and Downgrade kernel
+- Check current installed packages
+```bash
+rpm -qa | grep kernel
+uname -r
+```
+### Downgrade Kernel
+#### Method 1
+```bash
+# GRUB_DEFAULT=saved change value
+# 0 :- current Kernel
+# 1 :- Previous kernel
+# 2 :- Previous to Previous kernel
+[root@jumphost ~]# cat /etc/default/grub
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="crashkernel=auto spectre_v2=retpoline rhgb quiet"
+GRUB_DISABLE_RECOVERY="true"
+[root@jumphost ~]#
+```
+```bash
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+
+#### Method 2
+- saved_entry value change to 1 for previous
+```bash
+[root@jumphost ~]# cat /boot/grub2/grubenv
+# GRUB Environment Block
+saved_entry=CentOS Linux (3.10.0-1160.el7.x86_64) 7 (Core)
+###[root@jumphost ~]#
+```
+```bash
+grub-mkconfig -o /boot/grub2/grub.cfg
+```
+
+#### Method 3
+
+- Run below command to set the kernel
+-  This will change value in `/boot/grub2/grubenv`
+```bash
+grub2-set-default 1
+```
+- Make changes `grub.cfg` file
+
+```bash
+grub-mkconfig -o /boot/grub2/grub.cfg
+```
+
+### After patching, we boot with new kernel we are getting the error 
+- Start VM
+- Boot with by choosing rescue mode
+```bash
+grub2-set-default 1
+```
+- Make changes `grub.cfg` file
+
+```bash
+grub2-makeconfig -o /boot/grub2/grub.cfg
+```
+- Reboot the VM
+
+
+## Reinstall grub and how to recover
+- `unknown filesyatem` error while system boot
+- came `grub console`
+```bash
+grub> 
+ls
+```
+- Exit from grub the boot the system with DVD media
+- Run with `Troubleshooting` mode
+- continue with 1 option
+
+```bash
+chroot /mnt/sysimage
+# reinstall the grub
+grub2-install /dev/sda
+# Regenerate the file
+grub2-mkconfig -o /boot/grub2/grub.cfg
+```
+- reboot the VM
+
+## Build Initramfs
+```bash
+# dracut -f /boot/initramfs-<kernelVersion>.img <kernelVersion>
+```
+- IMPORTANT NOTE: Replace <kernelVersion> with the full version of the kernel you wish to rebuild.
+- ﻿EXAMPLE: (for kernel version "4.18.0-305.19.1.el8_4.x86_64")
+- Take backup first
+```bash
+# cp /boot/initramfs-4.18.0-305.19.1.el8_4.x86_64.img /boot/4.18.0-305.19.1.el8_4.x86_64.bak.$(date +%m-%d-%H%M%S).img
+
+# dracut -f /boot/initramfs-4.18.0-305.19.1.el8_4.x86_64.img 4.18.0-305.19.1.el8_4.x86_64
+```
+
+
+## nfs client trobleshooting
+
+https://nfs.sourceforge.net/nfs-howto/ar01s07.html
+
+.................................SHELL SCRIPTING................................
+
+To enable debuging mode in shell scripting 
+bash -x script.sh
+bash -v script.sh
+even more detail we can check combinly
+bash -xv script.sh
+
+- To check the scripting error
+bash -n script.sh
+
+
+1- by default 1024 ulim it has set to the user. ( ulimit -n to check, to increase ulimit #ulimit -Sn 900)
+2- what is deamon process... deamon process is the process which starrt automatically when the system start its run from start to end the server.' Daemon never die
+
+3- what is jombie process ..jombi process already dead we cant kill them
+We can prevent that by calling the wait call immediately after a child process is executed so that it's 
+cleaned up from the process table as soon as possible.
+Once a process becomes a zombie, it loses all of its memory pages, open file handles, semaphore locks, etc.
+
+4- to check the user running process ( pstree -p -u tarun)
+
+5- [root@worker ~]# pstree -p -s 2050 (bash: pstree: command not found) install "yum install psmisc -y"
+
+6 - sleep 200 &     (pstree 200 to get the output)
+*****
+7- suid set permission "find / -perm /u=s" to check to whome suid has been set
+    to give the permission to the user  "chmod u+s /usr/bin/ls"
+8- What is SGID ? It is laso especially useful for derictories that are often  used in collaborative efforts between members of a group.
+Any member of the gruop can access any files
+9- kernel source code we can see on "/usr/src/"
+10  #nmcli device status   (to check ni card details)
+11- nmcli connection show
+[root@server0 ~]# lab ipv6 setup
+[root@server0 ~]# ip link
+[root@server0 ~]# nmcli conn add con-name static-eno1 type ethernet ifname eno1
+[root@server0 ~]# nmcli con show
+[root@server0 ~]# nmcli con show static-eno1
+[root@server0 ~]# nmcli con mod static-eno1 ipv4.addresses '192.168.0.1/24'
+[root@server0 ~]# nmcli con mod static-eno1 ipv4.method manual
+[root@server0 ~]# ip a show dev eno1
+[root@server0 ~]# nmcli con down static-eno1
+[root@server0 ~]# nmcli con up static-eno1
+[root@server0 ~]# ip addr show dev eno1
+[root@server0 ~]# nmcli con show static-eno1 | grep dns
+[root@server0 ~]# nmcli con mod static-eno1 ipv4.dns 192.0.2.1 ①
+
+
+4- /etc/login.defs  and /etc/default/useradd is the user login config file.
+
+5- afetr creating password less ssh access, whenever i try to login to server it ask me for the password,j
+   while i have verified that my public key is placed on remote server.
+   ssh-add  (to check the status)
+   
+6- how to disable root account. ( usermod -s /sbin/nologin root)
+   how to enable root login again  ( sudo usermod -s /bin/bash root)
+
+
+7- Firewalld service files are located in two places:
+* /usr/lib/firewalld/services: Contains system and service defined services. Generally provided with
+default installation of packages.
+* /etc/firewalld/services: Contains custom firewalld service definitions.
+
+8- kernel module located on
+ls /usr/lib/modules/$(uname -r)/kernel
+
+9 - types of process in linux
+
+a- foreground process
+b- background process
+
+A rpocess could run in foreground and background , the priority of index of process is called 
+Nice in linux default value is 0 and it can very between 20 to -19
+
+10- how to set a perticulare cpu core to httpd srvice for example cpu-2
+                 #locate httpd.service
+                 #vim /usr/lib/systemd/system/httpd.service
+                 under service section
+                 CPUAffinity=2
+11- what is the maximum filenamed length allowed in linx
+                255 max length can be allowed 
+				
+12- what is drop cache in linux and how do you clear it ?
+                to free dentries and inods #echo 2> /sys/proc/vm/drop_caches
+                to free pagcache  #echo 1 > /proc/sys/vm/drop_caches
+                to free pagecache, dentries and inodes #echo 3 > /proc/sys/vm/drp_caches
+
+13- which ssh (output in below)
+rpm -qf /usr/bin/ssh
+openssh-client-7.0p1-13.el7.x86_64
+#rpm -ql openssh-client-7.0p1-13.el7.x86_64
+we can get the output of /etc/ssh/ssh_config   file   
+
+14- how to create a 100 mb file 
+#fallocate -l 100M tarunfile
+
+
+---kernel upgradation  ( kernel module located in # /lib/modules/3.10.0-1160.108.1.el7.x86_64/
+(cat /boot/grub2/grubenv  through this file we can boot the default kernel)
+or cat /etc/default/grub      (change the default to , 0=Default kernel, 1=previous kernel & 2=Last to last kernel.
+
+GRUB_DEFAULT=saved   replace it to   GRUB_DEFAULT=1
+:wq!
+
+commadn is #grub2-set-default 1
+           #grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+
+---top
+
+while true; do true; done &
+mpstat -P ALL 1
+jobs
+uptime
+
+---multipathing
+
+
+Multipathing is a technique used in storage area networks (SAN) to provide multiple physical paths between a server (host) and a storage device, like a disk array.
+This is done to increase reliability, fault tolerance, and performance.
+
+Key Concepts of Multipathing:
+Redundancy/Fault Tolerance: If one path between the server and the storage device fails (due to network issues, hardware failure, etc.),
+the multipathing setup can switch to an alternative path, ensuring that data is still accessible.
+
+Load Balancing: Multipathing can distribute I/O (input/output) operations across multiple available paths, 
+improving overall performance by balancing the load. 
+...........................................................
+-----SO patch update in details.
+---permission like suid/sgid/stickybit/acl permission/chmod/
+-----          
+ldd /usr/sbin/sshd |grep libwrap
+
+
+--------active or passive
+---port forwarding 
+..............................LVM REDUCE......................
+--lvm recover from remove lvm
+unmount the file system for reducing.
+Check the file system after unmount.
+Reduce the file system.
+Reduce the Logical Volume size than Current size.
+Recheck the file system for error.
+Remount the file-system back to stage.
+> First unmount the mount point.
+#umount -v /mnt/tecmint_reduce_test/
+> Then check for the file-system error using following command.
+# e2fsck -ff /dev/vg_tecmint_extra/tecmint_reduce_test
+>Next, reduce the file-system.
+#resize2fs /dev/vg_tecmint_extra/tecmint_reduce_test 10G
+>Reduce the Logical volume using GB size.
+# lvreduce -L -8G /dev/vg_tecmint_extra/tecmint_reduce_test
+>Re-size the file-system back, In this step if there is any error that means we have messed-up our file-system.
+#resize2fs /dev/vg_tecmint_extra/tecmint_reduce_test
+>Mount the file-system back to same point.
+# mount /dev/vg_tecmint_extra/tecmint_reduce_test /mnt/tecmint_reduce_test/
+
+#vgcfgrestore --list <vgname>             also we can serach the lost vg name # cd /etc/lvm/archive  
+
+16 - How to set environment variable in Linux
+#printenv
+#locate jre
+vi /etc/profile  (centralize)
+vi /home/user/bash_profile   (user level))
+
+..........................Linux HA cluster.............................
+
+yum install targetcli 
+yum install iscsi-initiator-utils lvm2 -y    need to install on both the server
+
+.......................SCP & Rsync..................
+
+Scp is object level command, scp is copy entire object every time.
+rsync is blob level command, rsync will copy only incremental deta.
+
+.................Disk read and write bytes...............
+iostat -xmt 1 1111 
+dstat
+sar -d 
+.............................Security............................
+.......................SLO........................
+SLO (service level objective) is the reliability target, SLI (Service level indecator)
+is the measuremenet metric, and SLA (Service level agreement) is the agreed-upon reliability 
+level between a service provider and customer..
+
+SLA - promise ( the promise we do with the customer or client that will give the faith to do this or that)
+SLOs - Goal (the goal we do stup for the customer or client )
+SLIs - What did we do ( what did we do for the customer or client or did we reach thre comitment or not)
+
+
+
+
+
+....................
+2 - How do you handle incidents and learn from them?
+
+I quickly respond to incidents,fix them , then analyze what went wrong to preventing
+similar issues in the future.
+
+
+3 - Can you build and maintain system a lot of users and doesn't break easilly.
+
+Yes I have designed a system to handle lots of users without crashing, using tools like kubernetes.
+and redundency techniques.
+
+4 - How do you keep system secure while ensuring they stay fast and reliable
+
+I do follow security best practise and work closely with security team to keep system safe without slowing them down.
+
+5 - Explain horizontal and vertical scaling.
+
+Horizontal scaling means adding more servers, while vertical scaling means upgrading existing servers.
+
+6 - How do set up and manage system configuration ?
+
+I automate configuration with tools like ansible and treat infrastructure like
+ code for consistency and scalability.
+ 
+7 - How do you know if womething is worong with a sysytem, and how do you get alerts.
+
+I set up monitoring tools like Prometheus or zabbix to watch for issues and send alerts when things go wrong.
+
+8 - How do you prioritized task in your roles as a Sitereliability engineer.
+
+I prioritize task based on their impact on service reliability  and user experiance.
+Critical issue that affect system stability or performance are addressed first, folowed by task.=
+aimed at improving long-term reliability and scalability.
+
+9 - Can you share a thought problem you fixed at work.
+
+Sure, once we had a sudden traffic spike, but i quickly found the issue,
+Optimized our systems, and got everything running smoothly again through teamwork.
+
+
+
+10 - how do you run the shell scripting file in background process
+ an- we can use the nohup command , bg , and & option to run the scripting through background.
+
+
+11 - what is ansible modules and plugins used for 
+
+Modules
+These are standalone scripts that perform specific actions on a local machine, remote host, or application programming interface (API). 
+They can be used to control system resources or execute system commands. Modules are usually written in Python, 
+but can be written in any language. They can be executed directly on remote hosts or through playbooks.
+Plugins
+These are pieces of code that extend Ansible's core functionality. They execute on the control node and offer options and extensions for core features such as:
+Transforming data
+Logging output
+Connecting to inventory 
+Modules and plugins can be used for a variety of IT functions, including:
+Networking, Provisioning, Security, Cloud management, User management, Configuration management, and Communications. 
+
+12 -  how many virtualization present in VMware.
+
+13 - what is vsphere and vcentre
+
+14 - what are the component there in Linux.
+
+15 - what is nohup and & (major difference )
+
+******************LINUX INTERVIEW QUESTION AND ANSWER**********************************
+
+1- by default 1024 ulim it has set to the user. ( ulimit -n to check, to increase ulimit #ulimit -Sn 900)
+2- what is deamon process... deamon process is the process which starrt automatically when the system start its run from start to end the server.' Daemon never die
+3- what is jombie process ..jombi process already dead we cant kill them
+4- to check the user running process ( pstree -p -u tarun)
+5- [root@worker ~]# pstree -p -s 2050 (bash: pstree: command not found) install "yum install psmisc -y"
+6 - sleep 200 &     (pstree 200 to get the output)
+***********
+7- suid set permission "find / -perm /u=s" to check to whome suid has been set
+    to give the permission to the user  "chmod u+s /usr/bin/ls"
+8- What is SGID ? It is laso especially useful for derictories that are oftenn  used in collaborative efforts between members of a group.
+Any member of the gruop can access any files
+9- kernel source code we can see on "/usr/src/"
+10  #nmcli device status   (to check ni card details)
+5- afetr creating password less ssh access, whenever i try to login to server it ask me for the password,j
+   while i have verified that my public key is placed on remote server.
+   ssh-add  (to check the status)
+6- how to disable root account. ( usermod -s /sbin/nologin root)
+   how to enable root login again  ( sudo usermod -s /bin/bash root)
+
+
+Firewalld service files are located in two places:
+• /usr/lib/firewalld/services: Contains system and service defined services. Generally provided with
+default installation of packages.
+• /etc/firewalld/services: Contains custom firewalld service definitions.
+
+8- kernel module located on
+ls /usr/lib/modules/$(uname -r)/kernel
+
+A rpocess could run in foreground and background , the priority of index of process is called 
+Nice in linux default value is 0 and it can very between 20 to -19
+12- what is drop cache in linux and how do you clear it ?
+                to free dentries and inods #echo 2> /sys/proc/vm/drop_caches
+                to free pagcache  #echo 1 > /proc/sys/vm/drop_caches
+                to free pagecache, dentries and inodes #echo 3 > /proc/sys/vm/drp_caches
+
+13- which ssh (output in below)
+rpm -qf /usr/bin/ssh
+openssh-client-7.0p1-13.el7.x86_64
+#rpm -ql openssh-client-7.0p1-13.el7.x86_64
+we can get the output of /etc/ssh/sshd_config   file   
+
+14- how to create a 100 mb file 
+#fallocate -l 100M tarunfile
+while true; do true; done &
+mpstat -P ALL 1
+jobs
+uptime
+
+--------active or passive
+---port forwarding 
+--lvm recover friom remove lvm
+
+#vgcfgrestore --list <vgname>             also we can serach the lost vg name # cd /etc/lvm/archive  
+
+16 - How to set environment variable in Linux
+ #printenv
+ #locate jre
+ vi /etc/profile  (centralize)
+ vi /home/user/bash_profile   (user level))
+   
+17 - LS command not working
+18 - what is the use of auto relabel.
+19 - 
+.............RHEL SUBSCRIPTIONMANAGER...............
+# subscription-manager remove --all
+# subscription-manager unregister
+# subscription-manager clean
+# yum clean all
+# rm -rf /var/cache/yum/*
+# subscription-manager register
+# subscription-manager attach --auto
+Once this is done, verify the subscription status and checkout the populate the repository:
+
+# subscription-manager status
+# yum repolist
+..........................................................
+
+..
+Q3- httpd configure
+
+systemctl --now enable httpd.service
+firewall-cmd --list-all
+firewall-cmd --permanent --add-port=82/tcp
+firewall-cmd --permanent --add-service=http
+firewall-cmd --reload
+vim /etc/httpd/conf/httpd.conf
+semanage port -l  |grep http
+man semanage port
+/EXAMPLE (SEARCH)
+semanage port -a -t http_port_t -p tcp 82
+semanage port -l  |grep http    
+systemctl restart httpd.service
+
+Q4- 
+
+groupadd sysadmins
+useradd -G sysadmins  natasha
+useradd -G sysadmins   harry
+useradd -s /sbin/nologin sarah
+chpasswd
+sarah:trootent
+natasha:trootent
+natasha:trootent
+groupmems -lg sysadmins
+cat /etc/shadow
+
+Q5--
+
+cat /etc/crontab
+crontab -eu natasha
+*/1 * * * * logger "EX200 in progress"
+crontab -lu natasha
+
+cat /var/log/messages |grep -i "EX200"     (Check the logs)
+ 
+Q6 --
+
+mkdir /home/manager
+chown :sysadmins /home/manager
+chmod 2770 /home/manager/
+ls -ld /home/manager/
+cd /home/manager/
+touch hello
+
+Q7 --
+
+rpm -qa |grep chrony
+timedatectl
+timedatectl set-ntp true
+vim /etc/chrony.conf
+systemctl restart chronyd.service
+chronyc sources
+chronyc tracking
+
+Q8 --
+
+yum install autofs*
+rpm -qa |grep autofs
+systemctl --now enable autofs.service
+
+vim /etc/auto.master
+/home/guests   /etc/auto.misc
+
+vim /etc/auto.misc
+Ldapuser2       -fstype=nfs,rw,sync     classroom.example.com:/home/guests/ldapuse2
+systemctl restart autofs.service
+
+in client machines we have to install 2 packages , nfs-utils and nfs4-acl-tools
+nfs use 2049 port 
+
+mkdir -p /mnt/client_share
+mount -t nfs 192.168.0.143:/mnt/nfs_share_docs /mnt/client_share
+
+nfsstat command to see the details and version
+showmount -e nfsip     (to check nfs client is connecting with nfs server or  not)
+
+Q9 --
+
+cp -rv /etc/fstab /var/tmp/
+getfacl /var/tmp/fstab
+setfacl -m u:sarah:rw /var/tmp/fstab
+setfacl -m u:harry:0 /var/tmp/fstab
+
+Q10 --
+
+useradd -u 2112 bob
+id bob
+passwd --stdin bob
+passwd -S bob
+
+Q11 --
+
+mkdir /root/harry-files
+find / -user harry -exec cp -rvfp {} /root/harry-files \;
+
+Q12 -- 
+
+grep ich "/usr/share/dict/words" > /root/lines
+cat /root/lines |grep ich
+
+Q13 --
+
+tar cvjf /root/backup.tar.bz2 /usr/local
+du -h /root/backup.tar.bz2
+
+Q14 --
+
+Go to single user mode rd.break    console=tty1 then ctrl+x
+
+mount -o remount.rw /sysroot/
+chroot /sysroot/
+passwd root
+touch /.autorelabel
+
+Q15 --
+
+Configure yum.repo ( as per note we can get the repo details on exam 
+
+Q16 --
+
+fdisk /dev/sdb
+mkfs.ext4 /dev/sdb1
+vgextend rhel /dev/sdb1
+lvextend -L +1GB /dev/rhel/root
+resize2fs /dev/mapper/rhel-root
+df -h
+
+Q17 -- 
+fdisk /dev/sdb
+mkswap /dev/sdb1
+UUID=edfe2152-5a04-4534-a007-c652df649bb0     swap   swap defaults   0 0
+mount -a
+swapon -a
+swapon /dev/sdb1
+free -m
+
+Q18 --
+fdisk /dev/sdb
+lvm
+pvcreate /dev/sdb3
+partprobe
+vgcrete 
+vgcfreate -s 8MB wgroup /dev/sdb3
+lvcreate -n wshare -l 50 wgroup
+mount /mnt/wshare                    (then etc fstab entry)
+mkfst.vfat /dev/wgroup/wshare
+
+Q19 -- 
+
+yum install vdo*
+yum install kmod-kvdo
+systemctl --now enable vdo.service
+man  vdo   (/EXAMPLE)
+vdo create --name=Vdo1 --device=/dev/sdc --vdoLogicalSize=10T
+vdostats
+mkdir /vdomount
+vim /etc/fstab
+UUID=e24bf98f-6d96-424a-ba40-58158f7dd747  /vdomount xfs  defaults,x-systemd.requires=vdo.services
+mount -a
+
+
+Q20 --
+
+yum install tuned
+systemctl status tuned.service
+tuned-adm active
+tuned-adm recomended
+tuned-adm profile virtual-guests
+tuned-adm active  (to check)
+systemctl restart tuned.service
+
+21 - Nexpose vulnerability fixes
+
+critical - 15 days
+high - 30 days
+medium - 60 days
+low - 90 days
+
+----Weak ciphers algoriothms
+---Birthday attack, diff-hellman , hmac-sha1
+- Resin version discloser 
+- Httpd header fixes
+- content security fixes
+- php version discloser
+- unwanted port opend
+- affected packages available need to upgrade
+----www alias not found
+.............................................................................
+1 - To increase buffer size in linux 
+Tune Linux Kernel Parameters
+You can adjust various kernel parameters to optimize performance during high load:
+
+a. Increase TCP Buffer Sizes:
+
+Edit /etc/sysctl.conf to increase TCP buffer sizes
+
+net.core.rmem_max = 16777216
+net.core.wmem_max = 16777216
+net.ipv4.tcp_rmem = 4096 87380 16777216
+net.ipv4.tcp_wmem = 4096 65536 16777216
+
+to apply the changes 
+sudo sysctl -p
+.................................................................................
+
+
+1- how to make your file immutable
+  - we can do through chattr ( change attribute file 
+  - #lsattr
+  -#chattr +i shell-sc
+   # cat /dev/null > shell-sc  ( Operation not permitted)
+   #ln shell-sc  shell-sc-doc ( Operation not permitted)
+  - to remove the immutable file the use the -i command and trying
+  #chattr -i shell-sc
+2 - how would you check if command is executed properly or not.
+  - echo $?       (value should be 0, means command executed successfully, if put have some number means not executed)
+  - #lsdf      
+  - echo $?    outp[ut is 127 means its wrong
+
+2- how do you migrate 8 to 9 directly.
+3- how you do the changes of kernel tuning parameter, in which file you nned to add or changes
+4 - how you will check then last file modified in directory. if its long listed
+  - ls -lrt 
+5 - How do you change the grub.
+
+6 - what is load average of servers
+  - top last1 m,inute last 5 minute last 15 m inute
+  
+  
+7 - What if df output getting then it will make 2 file OK and error output.txt file, how you will do that.
+8 - there is a mount point and you want to comment some line on file withot insearting the file how will do that
+9 - I want a line in config file without entrning to the file how will you do that.
+10 - RAm is 50% free still swap file taking high, what cause the reason.
+11 - Shell scripting have you exxperianced
+12 - what is handlers, what points is there in ansible.
+13 - what is S3 bucket.
+14 - what ticketing tools you have, do you use remedy ticketing tools ?
+15 - there is a file /a/b/c/d/file i want no one can change or dlete the file how will you do that.
+16 - What is the use of CUT command.
+17 - Have you worked on cluster.
+18 - where the cluster config file is located.
+19 - how you do the pacth activity manual ao automation or which tools.
+20 - if cluster server you want to patch it how you do that.
+21 - there is a multiple entry in linux resolv.conf but how you will take the lower ip to take first.
+2- by increasing the value of renice 
+  - Nice value can be change -20 +19 , - value can take te priority first and focous on this process ist. + value later
+  -  nice -n +10 sleep 8000 &    (check ps -l  it will be pri 90    here + is there so it will be less priority in compire to pri 80)
+  - nice value can be set only process is not runnig.
+  - renice, in this case its reverse we can do the changes of nice value in running process
+  -  nice -n -19  sleep 40000 &   (pri61 so processor will give the ist priroty )
+  - renice +19 1751       
+
+22 - Verify that systemd is properly running. You can check this using:
+a - ps -p 1 -o comm=       (If the output is not systemd, it means systemd is not running)
+
+23 - how many type of nic bonding do you know.
+
+24 - what cluster do you use, what is the configuration file.
+
+
+25 - to check the load average
+   - cat /proc/loadavg   (0.00 0.00 0.00 1/299 2225) current running process, total process 299
+   - top
+26 - what is the use of kernel module
+   - Device Drivers
+   - Kernel modules are widely used for device drivers. Drivers manage the interaction between the operating system and hardware devices like graphics cards, network adapters, and USB devices.
+   - Each driver is developed as a separate module, making it easy to update or remove drivers without affecting the entire system.
+
+27 - what is kdump
+   - Kdump relies on kexec, a fast boot mechanism that allows booting directly into a second kernel without going through the system BIOS. Here’s a breakdown of the process:
+   - Primary Kernel and Reserved Memory:
+   - Kdump requires you to reserve a portion of memory at boot time, where the crash dump kernel (or "capture kernel") will run if the primary kernel crashes.
+   - This reserved memory is isolated and untouched by the main kernel during normal operations.
+28 - What is shell scripting..>
+   - Shell script consist of set of commands to perform a task.
+
+
+
+
+
+
+
+ - Which module used in Terraform ??
+ 
+ 1. Standard Terraform Modules
+aws: A popular provider module that helps define resources in Amazon Web Services.
+azurerm: For defining resources in Microsoft Azure.
+google: Manages resources on Google Cloud Platform.
+kubernetes: Manages Kubernetes resources.
+These modules are maintained by Terraform and are available on the Terraform Registry, where you can find many other provider-specific modules as well.
+
+2. Custom Modules
+Infrastructure Components: You can create custom modules for different components, like vpc, subnet, ec2, or database.
+Security Modules: Modules to manage security groups, IAM roles, and policies.
+3. Utility Modules
+Terraform Random: Generates random values, such as random strings or numbers, for use in naming or resource configurations.
+.......................................................
+-  how to sheduled job in 30 sec
+
+#!/bin/bash
+
+while true; do
+    # Place your command or script here
+    echo "Running job at $(date)" >> /path/to/logfile.log
+    
+    # Wait for 30 seconds before the next iteration
+    sleep 30
+done
+
+..................................................................................
+-  find /root/maintanance/ -name "*.sh" | xargs  ls -l                           (using xargs we can search file )
+...........................................
+2. Common Types of Kernel Modules
+Device Drivers: Modules that allow the kernel to interact with hardware components, like network cards, USB devices, and storage devices.
+Filesystem Support: Modules that add support for different filesystems (e.g., NTFS, FAT32, or network filesystems like NFS).
+Network Protocols: Modules that implement network protocols (e.g., IPv6 support, Virtual Private Network (VPN) support).
+Security and Cryptography: Modules for handling encryption, hashing, and other security functions (e.g., iptables, firewalls).
+System Calls and Virtualization: Modules that add or modify system calls or support virtualization features, like kernel-based virtual machines (KVM).
+................................................................
+
+
+
+
+-  Linux file system explain
+-  Kernele modules
+-  what is inode how to check the inode no for file
+-  Ask inode in details
+-  specific process swap utilization
+-  EC2-Instance type
+-  Ansible roles and modules differnce
+-  ansible vault use case
+-  where used the spot instance
+-  EBS & EFS
+- Service for monitor the s3 bucket history
+- kubernetes networking istlio
+- How to upgrade the file system.
+- Any idea about kubernetes service account
+
+
+
+
+
+
+
+
+
+           
+
+
+
+
+
+
+
+
+
+
+
+
